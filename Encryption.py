@@ -5,7 +5,7 @@ Lng = 'yLwVl0zKqws7LgKPRQ84Mdt708T1qQ3Ha7xv3H7NyU84p21BriUWBU43odz3iP4rBL3cD02KZ
 try:
     PawD = sys.argv[1]
 except IndexError:
-    PawD = 'rjl@123'
+    PawD = 'password____'
 def encrypt_passwd(a, b, c):
     e = ''
     f, g, h, k, l = 187, 187, 187, 187, 187
