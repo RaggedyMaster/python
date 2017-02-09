@@ -52,7 +52,6 @@ auth = """
 
 """
 Set_clsss_help = """
-
     限速              Use:set limit Hostname Mac Limit_up Limit_down
     设置LAN网络         use:set net lan MODE IP_addr Netmask
     设置PPPOEmac地址      use : set mac auto|Mac_addr:xx:xx:xx:xx:xx
