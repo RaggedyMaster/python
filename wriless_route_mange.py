@@ -4,6 +4,7 @@
     author='Mr RaoJL',
     author_email='dasinenge@gmail.com',
     description='TL-WR886N wireless route manger script(terminal)'
+
 """
 import json
 import requests
@@ -67,6 +68,11 @@ Set_clsss_help = """
     设置上网时间         use: set plan rule [name] [host_mac] [mon{0|1}] [tue{0|1}] [wed{0|1}] [thu{0|1}] [fri{0|1}] [sat{0|1}] [sun{0|1}]  [start_time] [end_time]
     设备命名            use: set name [mac] [name]
     解除上网时间限制    use: unset rule [MAC]
+    开启热点            enable [guest|tp]
+    关闭热点            disable [guest|tp]
+    断开广域网连接       set wan disable
+    连接广域网           set wan connect
+
 """
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -79,7 +85,22 @@ def Login():
     global get_data
     global full_url
     error_code = 0
-    url = 'http://10.10.10.10/'
+    try:
+        url = sys.argv[1]
+        if re.search('[0-9]{1,3}(\.[0-9]{1,3}){3}',url):
+            url = 'http://'+sys.argv[1]+'/'
+            try:
+                requests.get(url=url,timeout=12)
+            except requests.ConnectionError:
+                print "网络不可达"
+                Log_out()
+                return False 
+        else:
+            print "IP格式错误:",url
+            Log_out()
+            return False
+    except IndexError:
+        url = 'http://10.10.10.10/'
     Y_passwd = getpass.getpass('输入登录密码 >>> ')
     En_passwd = Encrypt(passwd=Y_passwd).encrypt_passwd()
     post_data = {'login': {'password': En_passwd}, 'method': 'do'}
@@ -651,6 +672,16 @@ class Set_Rule:
             print 'ok'
         else:
             print 'error: ', error_code
+    def pppoe_connect(self):
+        if self.plan_rule['flat'] == 'connect':
+            conne={"network":{"change_wan_status":{"proto":"pppoe","operate":"connect"}},"method":"do"}
+        else:
+            conne={"network":{"change_wan_status": {"proto":"pppoe","operate":"disconnect"}},"method":"do"}
+        error_code = requests.post(url=self.url, json=conne).json()['error_code']
+        if error_code == 0:
+            print 'ok'
+        else:
+            print error_code
 
 
 def Select_class():
@@ -777,6 +808,13 @@ def Select_class():
                     Set_Rule(url=full_url, plan_rule=unset_dict).unset_time()
                 else:
                     pass
+            elif re.match('set wan \S+',cmd):
+                wan = cmd.split(' ')
+                if wan.__len__() == 3:
+                    wan_dict = {'flat': wan[2]}
+                    Set_Rule(url=full_url,plan_rule=wan_dict).pppoe_connect()
+                else:
+                    pass
             else:
                 pass
         except IndexError as e:
@@ -872,4 +910,7 @@ if __name__ == '__main__':
         elif re.match('systeminfo', cmd):
             systeminfo()
         else:
-            Json_Post_Data(cmd)
+            try:
+                Json_Post_Data(cmd)
+            except NameError as ER:
+                print ER
