@@ -29,5 +29,5 @@ def encrypt_passwd(a, b, c):
                 l = ord(a[p])
                 n = ord(b[p])
         e += c[(l ^ n) % k]
-    print e
-encrypt_passwd(short, PawD, Lng )
+    return e
+print encrypt_passwd(short, PawD, Lng )
