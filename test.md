@@ -1,6 +1,9 @@
 #### hello world
 [Hello world](https://www.baidu.com)
 ```
-  def func(x):
-      return x
+import os
+import sys
+import readline,rlcompleter
+def func(x):
+  return x
 ```
